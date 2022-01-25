@@ -7,7 +7,7 @@ import org.bukkit.entity.Player
 import pl.betoncraft.betonquest.BetonQuest
 
 fun Player.getNoobiePoints(): Int? {
-    return BetonQuest.getInstance().getPlayerData(uniqueId).points.firstOrNull { it.category == "noobie_quest" }?.count
+    return BetonQuest.getInstance().getPlayerData(uniqueId).points.find { it.category == "noobie_quest" }?.count
 }
 
 fun Player.addNoobiePoints(int: Int) {

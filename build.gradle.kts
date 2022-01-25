@@ -40,6 +40,7 @@ dependencies {
     compileOnly("com.taylorswiftcn:UIFactory:1.0.0-SNAPSHOT@jar")
     compileOnly("net.sakuragame:DataManager-Bukkit-API:1.3.2-SNAPSHOT@jar")
     compileOnly("biz.paluch.redis:lettuce:4.1.1.Final@jar")
+    implementation("net.sakuragame.eternal:GemsEconomy:4.9.4-SNAPSHOT@jar")
     compileOnly("ink.ptms.core:v11200:11200:all")
     compileOnly(kotlin("stdlib"))
     compileOnly(fileTree("libs"))
