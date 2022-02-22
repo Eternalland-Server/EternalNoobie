@@ -1,12 +1,12 @@
 package net.sakuragame.eternal.noobie.function
 
 import ink.ptms.zaphkiel.ZaphkielAPI
+import me.skymc.kirracoord.KirraCoordAPI
 import net.sakuragame.eternal.dragoncore.api.event.YamlSendFinishedEvent
 import net.sakuragame.eternal.justmessage.api.MessageAPI
 import net.sakuragame.eternal.kirraparty.bukkit.event.PartyCreateEvent
 import net.sakuragame.eternal.noobie.addNoobiePoints
 import net.sakuragame.eternal.noobie.getNoobiePoints
-import net.sakuragame.kirracoords.KirraCoordsAPI
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
@@ -19,12 +19,14 @@ import taboolib.platform.util.giveItem
 @Suppress("SpellCheckingInspection", "SpellCheckingInspection")
 object FunctionListener {
 
-    val succCreateTeamMessage = "&6&l➱ &e成功创建队伍, 快找樱儿答复吧!".colored()
+    private const val PERMISSION = "noobie_tutorial"
+
+    private val succCreateTeamMessage = "&6&l➱ &e成功创建队伍, 快找樱儿答复吧!".colored()
 
     @SubscribeEvent
     fun e(e: PlayerQuitEvent) {
         val player = e.player
-        if (player.getNoobiePoints() == null) {
+        if (player.getNoobiePoints() == null && !player.hasPermission(PERMISSION)) {
             player.removePotionEffect(PotionEffectType.BLINDNESS)
             player.removePotionEffect(PotionEffectType.CONFUSION)
         }
@@ -47,7 +49,7 @@ object FunctionListener {
         submit(async = false, delay = 20L) {
             val player = e.player
             if (!player.isOnline) return@submit
-            if (player.hasPermission("noobie_tutorial")) {
+            if (player.hasPermission(PERMISSION)) {
                 return@submit
             }
             if (player.getNoobiePoints() == null) {
@@ -57,7 +59,7 @@ object FunctionListener {
             if (noobiePoints >= 3) {
                 return@submit
             }
-            KirraCoordsAPI.tpCoord(player, "noobie_tutorial_spawn")
+            KirraCoordAPI.tpCoord(player, "noobie_tutorial_spawn")
             player.sendTitle("", "&7&o一百年后...".colored(), 10, 100, 10)
             player.addPotionEffect(PotionEffect(PotionEffectType.BLINDNESS, 99999999, 40, false))
             player.addPotionEffect(PotionEffect(PotionEffectType.CONFUSION, 99999999, 40, false))
