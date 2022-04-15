@@ -14,7 +14,7 @@ import taboolib.platform.util.giveItem
 @Suppress("SpellCheckingInspection")
 object FunctionNoobieCmd {
 
-    @Awake(LifeCycle.ACTIVE)
+    @Awake(LifeCycle.ENABLE)
     fun init() {
         command("get-noobie-rewards") {
             execute<Player> { player, _, _ ->
@@ -25,10 +25,11 @@ object FunctionNoobieCmd {
                     user.data().add(PermissionNode.builder("noobie_tutorial").build())
                     it.saveUser(user)
                 }
-                EternalNoobie.conf.getStringList("reward-list").forEach {
+                EternalNoobie.dataFile.getStringList("reward-list").forEach {
                     val item = ZaphkielAPI.getItem(it, player)!!.rebuildToItemStack(player)
                     player.giveItem(item)
                 }
+                player.closeInventory()
             }
         }
     }

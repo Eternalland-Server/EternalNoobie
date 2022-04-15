@@ -1,12 +1,13 @@
 package net.sakuragame.eternal.noobie.function
 
 import ink.ptms.zaphkiel.ZaphkielAPI
-import me.skymc.kirracoord.KirraCoordAPI
 import net.sakuragame.eternal.dragoncore.api.event.YamlSendFinishedEvent
+import net.sakuragame.eternal.justability.api.event.PowerLevelChangeEvent
 import net.sakuragame.eternal.justmessage.api.MessageAPI
 import net.sakuragame.eternal.kirraparty.bukkit.event.PartyCreateEvent
 import net.sakuragame.eternal.noobie.addNoobiePoints
 import net.sakuragame.eternal.noobie.getNoobiePoints
+import org.bukkit.Bukkit
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
@@ -23,6 +24,8 @@ object FunctionListener {
 
     private val succCreateTeamMessage = "&6&l➱ &e成功创建队伍, 快找樱儿答复吧!".colored()
 
+    private val succPowerUpMessage = "&6&l➱ &e成功升级技能, 快找樱儿答复吧!".colored()
+
     @SubscribeEvent
     fun e(e: PlayerQuitEvent) {
         val player = e.player
@@ -34,13 +37,24 @@ object FunctionListener {
 
     @SubscribeEvent
     fun e(e: PartyCreateEvent) {
-        val player = e.player
+        val player = Bukkit.getPlayer(e.leaderUUID) ?: return
         val points = player.getNoobiePoints() ?: return
         if (points == 2) {
             player.sendMessage(succCreateTeamMessage)
             player.addNoobiePoints(1)
             BetonQuest.getInstance().getPlayerData(player.uniqueId).journal.update()
             player.giveItem(ZaphkielAPI.getItem("crabstick", player)!!.rebuildToItemStack(player))
+        }
+    }
+
+    @SubscribeEvent
+    fun e(e: PowerLevelChangeEvent.Post) {
+        val player = e.player
+        val points = player.getNoobiePoints() ?: return
+        if (points == 3) {
+            player.sendMessage(succPowerUpMessage)
+            player.addNoobiePoints(1)
+            BetonQuest.getInstance().getPlayerData(player.uniqueId).journal.update()
         }
     }
 
@@ -59,7 +73,6 @@ object FunctionListener {
             if (noobiePoints >= 3) {
                 return@submit
             }
-            KirraCoordAPI.tpCoord(player, "noobie_tutorial_spawn")
             player.sendTitle("", "&7&o一百年后...".colored(), 10, 100, 10)
             player.addPotionEffect(PotionEffect(PotionEffectType.BLINDNESS, 99999999, 40, false))
             player.addPotionEffect(PotionEffect(PotionEffectType.CONFUSION, 99999999, 40, false))
@@ -68,6 +81,7 @@ object FunctionListener {
                 MessageAPI.sendActionTip(player, "&6&l➱ &e提示: 去找樱儿.")
                 player.removePotionEffect(PotionEffectType.BLINDNESS)
                 player.removePotionEffect(PotionEffectType.CONFUSION)
+                BetonQuest.getInstance().getPlayerData(player.uniqueId).journal.removePointer("noobie_quest_journal_started")
                 BetonQuest.getInstance().getPlayerData(player.uniqueId).journal.addPointer("noobie_quest_journal_started")
                 BetonQuest.getInstance().getPlayerData(player.uniqueId).journal.update()
             }

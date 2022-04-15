@@ -1,7 +1,7 @@
 plugins {
-    java
-    id("io.izzel.taboolib") version "1.31"
-    id("org.jetbrains.kotlin.jvm") version "1.5.10"
+    `java-library`
+    id("io.izzel.taboolib") version "1.34"
+    id("org.jetbrains.kotlin.jvm") version "1.5.30"
 }
 
 taboolib {
@@ -12,7 +12,7 @@ taboolib {
     install("module-chat")
     install("platform-bukkit")
     classifier = null
-    version = "6.0.7-26"
+    version = "6.0.7-41"
 }
 
 repositories {
@@ -30,7 +30,8 @@ repositories {
 }
 
 dependencies {
-    compileOnly("net.luckperms:api:5.3")
+    compileOnly("net.luckperms:api:5.4")
+    compileOnly("net.sakuragame.eternal:JustAbility:1.0.0-SNAPSHOT@jar")
     compileOnly("ink.ptms:Zaphkiel:1.7.0@jar")
     compileOnly("net.sakuragame.eternal:BetonQuest:1.13.0-SNAPSHOT@jar")
     compileOnly("net.sakuragame.eternal:JustMessage:1.0.0-SNAPSHOT@jar")
