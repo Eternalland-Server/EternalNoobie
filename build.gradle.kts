@@ -5,6 +5,11 @@ plugins {
 }
 
 taboolib {
+    description {
+        dependencies {
+            name("JustQuest")
+        }
+    }
     install("common")
     install("common-5")
     install("module-lang")
@@ -12,7 +17,7 @@ taboolib {
     install("module-chat")
     install("platform-bukkit")
     classifier = null
-    version = "6.0.7-41"
+    version = "6.0.7-54"
 }
 
 repositories {
@@ -30,12 +35,10 @@ repositories {
 }
 
 dependencies {
+    compileOnly("net.sakuragame.eternal:JustQuest:1.0.0-SNAPSHOT@jar")
     compileOnly("net.luckperms:api:5.4")
-    compileOnly("net.sakuragame.eternal:JustAbility:1.0.0-SNAPSHOT@jar")
-    compileOnly("ink.ptms:Zaphkiel:1.7.0@jar")
-    compileOnly("net.sakuragame.eternal:BetonQuest:1.13.0-SNAPSHOT@jar")
     compileOnly("net.sakuragame.eternal:JustMessage:1.0.0-SNAPSHOT@jar")
-    compileOnly("net.sakuragame.eternal:KirraCore-Bukkit:1.1.5-SNAPSHOT@jar")
+    compileOnly("net.sakuragame.eternal:KirraCore-Bukkit:1.2.3-SNAPSHOT@jar")
     compileOnly("net.sakuragame.eternal:DragonCore:2.4.8-SNAPSHOT@jar")
     compileOnly("com.taylorswiftcn:UIFactory:1.0.0-SNAPSHOT@jar")
     compileOnly("net.sakuragame.eternal:GemsEconomy:4.9.4-SNAPSHOT@jar")

@@ -1,89 +1,47 @@
 package net.sakuragame.eternal.noobie.function
 
-import ink.ptms.zaphkiel.ZaphkielAPI
+import net.luckperms.api.node.types.PermissionNode
 import net.sakuragame.eternal.dragoncore.api.event.YamlSendFinishedEvent
-import net.sakuragame.eternal.justability.api.event.PowerLevelChangeEvent
 import net.sakuragame.eternal.justmessage.api.MessageAPI
-import net.sakuragame.eternal.kirraparty.bukkit.event.PartyCreateEvent
-import net.sakuragame.eternal.noobie.addNoobiePoints
-import net.sakuragame.eternal.noobie.getNoobiePoints
-import org.bukkit.Bukkit
-import org.bukkit.event.player.PlayerQuitEvent
+import net.sakuragame.eternal.justquest.JustQuest
+import net.sakuragame.eternal.justquest.api.JustQuestAPI
+import net.sakuragame.eternal.justquest.api.event.QuestAccountLoadEvent
+import net.sakuragame.eternal.noobie.EternalNoobie
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
-import pl.betoncraft.betonquest.BetonQuest
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.submit
 import taboolib.module.chat.colored
-import taboolib.platform.util.giveItem
 
 @Suppress("SpellCheckingInspection", "SpellCheckingInspection")
 object FunctionListener {
 
     private const val PERMISSION = "noobie_tutorial"
-
-    private val succCreateTeamMessage = "&6&l➱ &e成功创建队伍, 快找樱儿答复吧!".colored()
-
-    private val succPowerUpMessage = "&6&l➱ &e成功升级技能, 快找樱儿答复吧!".colored()
+    private const val QUEST_ID = "foreword"
 
     @SubscribeEvent
-    fun e(e: PlayerQuitEvent) {
-        val player = e.player
-        if (player.getNoobiePoints() == null && !player.hasPermission(PERMISSION)) {
-            player.removePotionEffect(PotionEffectType.BLINDNESS)
-            player.removePotionEffect(PotionEffectType.CONFUSION)
-        }
-    }
-
-    @SubscribeEvent
-    fun e(e: PartyCreateEvent) {
-        val player = Bukkit.getPlayer(e.leaderUUID) ?: return
-        val points = player.getNoobiePoints() ?: return
-        if (points == 2) {
-            player.sendMessage(succCreateTeamMessage)
-            player.addNoobiePoints(1)
-            BetonQuest.getInstance().getPlayerData(player.uniqueId).journal.update()
-            player.giveItem(ZaphkielAPI.getItem("crabstick", player)!!.rebuildToItemStack(player))
-        }
-    }
-
-    @SubscribeEvent
-    fun e(e: PowerLevelChangeEvent.Post) {
-        val player = e.player
-        val points = player.getNoobiePoints() ?: return
-        if (points == 3) {
-            player.sendMessage(succPowerUpMessage)
-            player.addNoobiePoints(1)
-            BetonQuest.getInstance().getPlayerData(player.uniqueId).journal.update()
-        }
-    }
-
-    @SubscribeEvent
-    fun e(e: YamlSendFinishedEvent) {
+    fun e(e: QuestAccountLoadEvent) {
         submit(async = false, delay = 20L) {
-            val player = e.player
-            if (!player.isOnline) return@submit
+            val player = e.player ?: return@submit
+            val account = e.account
             if (player.hasPermission(PERMISSION)) {
                 return@submit
             }
-            if (player.getNoobiePoints() == null) {
+            if (account.finished.contains(QUEST_ID) || account.questProgress.keys.contains(QUEST_ID)) {
                 return@submit
             }
-            val noobiePoints = player.getNoobiePoints()!!
-            if (noobiePoints >= 3) {
-                return@submit
-            }
+            JustQuestAPI.allotQuest(player, QUEST_ID)
             player.sendTitle("", "&7&o一百年后...".colored(), 10, 100, 10)
-            player.addPotionEffect(PotionEffect(PotionEffectType.BLINDNESS, 99999999, 40, false))
             player.addPotionEffect(PotionEffect(PotionEffectType.CONFUSION, 99999999, 40, false))
             submit(delay = 40) {
                 player.sendTitle("", "&d&o诶诶诶，那个谁，你怎么睡在地上啊。(好听的女声)".colored(), 10, 100, 10)
                 MessageAPI.sendActionTip(player, "&6&l➱ &e提示: 去找樱儿.")
-                player.removePotionEffect(PotionEffectType.BLINDNESS)
                 player.removePotionEffect(PotionEffectType.CONFUSION)
-                BetonQuest.getInstance().getPlayerData(player.uniqueId).journal.removePointer("noobie_quest_journal_started")
-                BetonQuest.getInstance().getPlayerData(player.uniqueId).journal.addPointer("noobie_quest_journal_started")
-                BetonQuest.getInstance().getPlayerData(player.uniqueId).journal.update()
+                EternalNoobie.luckPermsAPI.userManager.also {
+                    val user = it.getUser(player.uniqueId)!!
+                    user.data().add(PermissionNode.builder("noobie_tutorial").build())
+                    it.saveUser(user)
+                }
             }
         }
     }
